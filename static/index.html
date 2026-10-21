@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sloth Sorter — Slow & Steady AI Folder Organizer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦥</text></svg>">
+</head>
+<body class="forest-dark">
+  <!-- Top Navigation & Health Bar -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand">
+        <div class="brand-mascot-mini" id="mini-mascot">🦥</div>
+        <div>
+          <h1 class="brand-title">Sloth Sorter</h1>
+          <p class="brand-tagline">Does the chore so you don't have to. <span class="accent-text">Slowly.</span></p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <!-- Health status badge -->
+        <div id="health-badge" class="health-badge loading" title="Checking Ollama connection...">
+          <span class="health-dot"></span>
+          <span class="health-text" id="health-text">Checking AI Model...</span>
+        </div>
+        <button id="theme-toggle" class="btn-icon" title="Toggle theme (Forest Dark / Warm Meadow)">
+          <span id="theme-icon">🌙</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="app-main">
+    <div class="main-container">
+
+      <!-- Hero Mascot Card -->
+      <section class="mascot-hero-card">
+        <div class="mascot-animation-wrapper">
+          <!-- Inline SVG Sloth Mascot -->
+          <svg id="sloth-svg" class="sloth-svg state-sleeping" viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg">
+            <!-- Tree Branch -->
+            <path d="M-10,45 Q90,35 180,48 T330,42" fill="none" stroke="#5C3D2E" stroke-width="18" stroke-linecap="round"/>
+            <path d="M-10,45 Q90,35 180,48 T330,42" fill="none" stroke="#422A1D" stroke-width="6" stroke-dasharray="14 10" stroke-linecap="round"/>
+            <!-- Vines & Leaves on Branch -->
+            <path d="M50,42 Q70,70 60,95" fill="none" stroke="#2D6A4F" stroke-width="4" stroke-linecap="round"/>
+            <circle cx="60" cy="95" r="7" fill="#52B788"/>
+            <path d="M250,44 Q230,80 245,105" fill="none" stroke="#2D6A4F" stroke-width="4" stroke-linecap="round"/>
+            <circle cx="245" cy="105" r="8" fill="#52B788"/>
+
+            <!-- Hanging Sloth Group -->
+            <g id="sloth-body-group" class="sloth-body-group">
+              <!-- Arms hanging on branch -->
+              <path d="M125,48 Q115,75 130,95" fill="none" stroke="#8D6E63" stroke-width="16" stroke-linecap="round"/>
+              <path d="M185,48 Q195,75 180,95" fill="none" stroke="#8D6E63" stroke-width="16" stroke-linecap="round"/>
+              <!-- Claws holding branch -->
+              <path d="M120,40 Q125,32 128,42 M126,40 Q131,32 134,42" fill="none" stroke="#D7CCC8" stroke-width="3" stroke-linecap="round"/>
+              <path d="M180,40 Q185,32 188,42 M186,40 Q191,32 194,42" fill="none" stroke="#D7CCC8" stroke-width="3" stroke-linecap="round"/>
+
+              <!-- Fluffy Torso -->
+              <ellipse cx="155" cy="102" rx="36" ry="28" fill="#8D6E63"/>
+              <!-- Belly highlight -->
+              <ellipse cx="155" cy="104" rx="24" ry="18" fill="#A1887F"/>
+
+              <!-- Sloth Head -->
+              <g id="sloth-head" class="sloth-head">
+                <circle cx="155" cy="74" r="24" fill="#8D6E63"/>
+                <!-- Cream face mask -->
+                <ellipse cx="155" cy="76" rx="19" ry="16" fill="#D7CCC8"/>
+                <!-- Eye Patches (classic sloth markings) -->
+                <path d="M141,74 Q135,70 144,66 Q150,70 141,74" fill="#5D4037"/>
+                <path d="M169,74 Q175,70 166,66 Q160,70 169,74" fill="#5D4037"/>
+
+                <!-- Eyes: Sleeping State (curved lines) -->
+                <g id="eyes-sleeping" class="eyes-sleeping">
+                  <path d="M138,71 Q142,75 146,71" fill="none" stroke="#3E2723" stroke-width="2.5" stroke-linecap="round"/>
+                  <path d="M164,71 Q168,75 172,71" fill="none" stroke="#3E2723" stroke-width="2.5" stroke-linecap="round"/>
+                </g>
+
+                <!-- Eyes: Awake State (big bright open eyes with glint) -->
+                <g id="eyes-awake" class="eyes-awake" style="display:none;">
+                  <circle cx="142" cy="71" r="4.5" fill="#1B1B1B"/>
+                  <circle cx="140.5" cy="69.5" r="1.6" fill="#FFFFFF"/>
+                  <circle cx="168" cy="71" r="4.5" fill="#1B1B1B"/>
+                  <circle cx="166.5" cy="69.5" r="1.6" fill="#FFFFFF"/>
+                </g>
+
+                <!-- Eyes: Happy State (smiling arc) -->
+                <g id="eyes-happy" class="eyes-happy" style="display:none;">
+                  <path d="M138,72 Q142,67 146,72" fill="none" stroke="#3E2723" stroke-width="3" stroke-linecap="round"/>
+                  <path d="M164,72 Q168,67 172,72" fill="none" stroke="#3E2723" stroke-width="3" stroke-linecap="round"/>
+                  <!-- Rosy Cheeks -->
+                  <circle cx="137" cy="77" r="3.5" fill="#FF8A80" opacity="0.7"/>
+                  <circle cx="173" cy="77" r="3.5" fill="#FF8A80" opacity="0.7"/>
+                </g>
+
+                <!-- Cute Snout & Nose -->
+                <ellipse cx="155" cy="79" rx="6" ry="4" fill="#4E342E"/>
+                <!-- Mouth -->
+                <path id="sloth-mouth" d="M152,83 Q155,86 158,83" fill="none" stroke="#3E2723" stroke-width="1.8" stroke-linecap="round"/>
+              </g>
+
+              <!-- Floating Sleep Zzz's -->
+              <g id="sleep-bubbles" class="sleep-bubbles">
+                <text x="188" y="55" font-family="'Outfit', sans-serif" font-weight="700" font-size="14" fill="#FBBF24" opacity="0.85">Z</text>
+                <text x="198" y="42" font-family="'Outfit', sans-serif" font-weight="700" font-size="18" fill="#FBBF24" opacity="0.65">z</text>
+                <text x="210" y="28" font-family="'Outfit', sans-serif" font-weight="700" font-size="22" fill="#FBBF24" opacity="0.45">z</text>
+              </g>
+            </g>
+          </svg>
+        </div>
+
+        <div class="mascot-text-block">
+          <div class="sloth-status-bubble" id="sloth-speech">
+            "Zzz... I process one file at a time so your laptop never breaks a sweat. Wake me when you're ready."
+          </div>
+          <div class="specs-pills">
+            <span class="pill"><span class="pill-icon">💻</span> RTX 3050 Gentle</span>
+            <span class="pill"><span class="pill-icon">🔒</span> 100% Offline & Private</span>
+            <span class="pill"><span class="pill-icon">🧠</span> Gemma 3:4B Multimodal</span>
+            <span class="pill"><span class="pill-icon">⏪</span> Safe & Undoable</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Folder Configuration & Launch Panel -->
+      <section class="panel-card config-panel">
+        <div class="panel-header">
+          <h2>Select Messy Folder</h2>
+          <div class="quick-helpers">
+            <button type="button" id="btn-use-sample" class="btn-link">⚡ Quick Demo: Use sample_mess</button>
+          </div>
+        </div>
+
+        <form id="sort-form" onsubmit="return false;">
+          <div class="input-group">
+            <div class="input-wrapper">
+              <span class="input-icon">📁</span>
+              <input 
+                type="text" 
+                id="folder-input" 
+                placeholder="Enter folder path (e.g. C:\Users\username\Desktop\mess or /Users/username/Downloads)" 
+                required 
+                autocomplete="off"
+                spellcheck="false"
+              >
+            </div>
+            <button type="button" id="btn-scan" class="btn-secondary" title="Peek at files without analyzing">
+              🔍 Scan Files
+            </button>
+            <button type="button" id="btn-wake" class="btn-primary">
+              <span class="btn-icon">🦥</span>
+              <span id="wake-btn-label">Wake The Sloth</span>
+            </button>
+          </div>
+
+          <!-- Advanced Options (collapsible / compact) -->
+          <div class="config-options">
+            <label class="checkbox-label" title="Scan subdirectories inside the folder">
+              <input type="checkbox" id="chk-recursive">
+              <span>Include subfolders (recursive)</span>
+            </label>
+            <div class="delay-control" title="Gentle pause between files to keep temperature low">
+              <label for="range-delay">Sloth pace delay: <strong id="lbl-delay">300ms</strong></label>
+              <input type="range" id="range-delay" min="100" max="1500" step="100" value="300">
+            </div>
+          </div>
+        </form>
+      </section>
+
+      <!-- Live Analysis Progress Tracker (Shown during/after analysis) -->
+      <section id="progress-section" class="panel-card progress-panel" style="display:none;">
+        <div class="progress-status-row">
+          <div class="progress-info">
+            <span class="status-pulse-dot"></span>
+            <span id="progress-text">Sloth is waking up...</span>
+          </div>
+          <div class="progress-stats">
+            <span id="progress-counter">0 / 0</span>
+            <span class="progress-percent" id="progress-percent">0%</span>
+          </div>
+        </div>
+
+        <!-- Custom Jungle Vine Progress Bar -->
+        <div class="vine-progress-track">
+          <div class="vine-progress-fill" id="progress-fill" style="width: 0%;">
+            <span class="vine-sloth-indicator">🦥</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sloth Report Stats Panel -->
+      <section id="sloth-report-card" class="panel-card sloth-report-panel" style="display:none;">
+        <div class="report-header">
+          <div class="report-title-group">
+            <span class="report-badge">📊 Sloth Report</span>
+            <span class="report-guarantee">🔒 0 bytes sent to the internet</span>
+          </div>
+          <button type="button" id="btn-close-report" class="btn-subtle btn-sm">&times; Dismiss</button>
+        </div>
+        <div class="report-grid">
+          <div class="report-stat-box">
+            <span class="stat-number" id="rep-total-files">0</span>
+            <span class="stat-label">Files Analyzed</span>
+          </div>
+          <div class="report-stat-box">
+            <span class="stat-number" id="rep-total-time">0.0s</span>
+            <span class="stat-label">Total Time</span>
+          </div>
+          <div class="report-stat-box">
+            <span class="stat-number" id="rep-avg-time">0.0s</span>
+            <span class="stat-label">Avg / File</span>
+          </div>
+          <div class="report-stat-box">
+            <span class="stat-number" id="rep-slowest-time">0.0s</span>
+            <span class="stat-label" id="rep-slowest-label" title="Slowest file">Slowest File</span>
+          </div>
+        </div>
+        <div class="report-breakdown-row">
+          <div class="breakdown-chips">
+            <span class="bd-chip model" id="rep-model-count">🤖 Model Classified: 0</span>
+            <span class="bd-chip extension" id="rep-ext-count">📁 Extension Only: 0</span>
+            <span class="bd-chip fallback" id="rep-fallback-count">⚠️ Rule Fallback: 0</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Results & Interactive Approval Preview Section -->
+      <section id="preview-section" class="panel-card preview-panel" style="display:none;">
+        <div class="preview-header">
+          <div class="preview-title-group">
+            <h2>Proposed Organization Plan</h2>
+            <p class="preview-subtitle">Review and tweak. Files will only be moved after you approve.</p>
+          </div>
+          
+          <div class="preview-actions">
+            <div class="selection-controls">
+              <button type="button" id="btn-select-all" class="btn-subtle">Select All</button>
+              <button type="button" id="btn-deselect-all" class="btn-subtle">Deselect All</button>
+            </div>
+            <!-- Big Apply Button -->
+            <button type="button" id="btn-apply" class="btn-apply">
+              <span class="apply-icon">✨</span>
+              <span id="apply-btn-text">Apply Organization (0 files)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Category Filters -->
+        <div class="category-filter-bar" id="category-filter-bar">
+          <button class="cat-filter-chip active" data-cat="ALL">All (<span id="cat-count-all">0</span>)</button>
+          <!-- Dynamic category chips inserted by JS -->
+        </div>
+
+        <!-- File Proposal Cards / Table Container -->
+        <div class="proposal-cards-container" id="proposals-list">
+          <!-- Streamed items appear here in real-time -->
+        </div>
+
+        <!-- Sticky Footer Apply Bar for Long Lists -->
+        <div class="sticky-apply-bar" id="sticky-apply-bar">
+          <div class="sticky-info">
+            <span id="sticky-selected-count">0 of 0 files selected</span>
+            <span class="sticky-subtext">Zero overwrites. Reversible at any time.</span>
+          </div>
+          <button type="button" id="btn-sticky-apply" class="btn-apply btn-sm">
+            <span>✨ Apply Changes</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Success / Results Modal Banner -->
+      <section id="success-banner" class="panel-card success-card" style="display:none;">
+        <div class="success-icon">🎉</div>
+        <div class="success-content">
+          <h3 id="success-title">Successfully Organized!</h3>
+          <p id="success-message">All approved files have been gently organized into category folders.</p>
+          <div class="success-stats" id="success-stats"></div>
+          <div class="success-actions">
+            <button type="button" id="btn-undo-latest" class="btn-undo">
+              <span>⏪ Undo This Run</span>
+            </button>
+            <button type="button" id="btn-sort-another" class="btn-secondary">
+              <span>Sort Another Folder</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Past Runs & History Section -->
+      <section class="panel-card history-panel" id="history-section">
+        <div class="panel-header" id="history-header">
+          <div class="history-title-block">
+            <h3>Past Runs & Undo History</h3>
+            <span class="history-count-badge" id="history-count-badge">0 runs</span>
+          </div>
+          <button type="button" id="btn-refresh-history" class="btn-subtle" title="Refresh history">🔄 Refresh</button>
+        </div>
+        <div id="history-list" class="history-list">
+          <div class="history-empty">Point to a folder and scan to view past organization runs.</div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Image Thumbnail Preview Modal -->
+  <div id="image-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-content">
+      <button class="modal-close" id="modal-close">&times;</button>
+      <img id="modal-img" src="" alt="File preview">
+      <div id="modal-caption" class="modal-caption"></div>
+    </div>
+  </div>
+
+  <footer class="app-footer">
+    <div class="footer-container">
+      <p>🦥 <strong>Sloth Sorter</strong> &bull; Runs 100% locally with Gemma via Ollama</p>
+    </div>
+  </footer>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

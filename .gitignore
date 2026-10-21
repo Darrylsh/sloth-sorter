@@ -1,0 +1,56 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Pytest & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Sloth Sorter runtime folders & test mess directories
+.sloth_log/
+.sloth_trash/
+sample_mess/
+realistic_mess/
+real_test/
+temp_fresh_install/
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Antigravity & Scratch
+scratch/
+.gemini/
