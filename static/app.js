@@ -365,6 +365,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function finishAnalysis() {
+    if (state.eventSource) {
+      state.eventSource.close();
+      state.eventSource = null;
+    }
     state.isAnalyzing = false;
     elements.wakeBtnLabel.textContent = "Wake The Sloth";
     elements.btnWake.classList.remove("btn-secondary");
